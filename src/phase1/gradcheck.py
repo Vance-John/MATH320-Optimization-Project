@@ -1,6 +1,12 @@
 import numpy as np
 
+# Simple numeric gradient checker to validate the backprop implementation.
+
 def numerical_grad(f, w, eps=1e-6):
+    """
+    Compute numeric gradient of scalar function f at point w using
+    centered finite differences.
+    """
     g_num = np.zeros_like(w)
     for j in range(len(w)):
         w_pos = w.copy(); w_pos[j] += eps
@@ -9,6 +15,17 @@ def numerical_grad(f, w, eps=1e-6):
     return g_num
 
 def check_gradient(model, X, Y, w, tol=1e-4):
+    """
+    Compare analytic gradient from `model.grad` with numeric estimate.
+
+    Args:
+        model: BinaryNN instance providing grad and loss.
+        X, Y: Input batch and one-hot labels.
+        w: Flat parameter vector.
+        tol: Acceptable relative error threshold.
+    Returns:
+        True if the relative error is below tolerance, otherwise False.
+    """
     analytic = model.grad(X, Y, w)
     f = lambda w_: model.loss(X, Y, w_)
     num = numerical_grad(f, w)

@@ -2,12 +2,24 @@ import numpy as np
 from .utils import tanh, tanh_prime, softmax
 
 class BinaryNN:
+    """
+    Two-layer neural network for binary classification on flattened MNIST images.
+    All parameters are stored as a single vector `w` so optimizers can work in
+    vector space while we manually reshape inside the model.
+    """
 
     def __init__(self, input_dim=784, hidden_dim=H, output_dim=2):
+        """
+        Args:
+            input_dim: Number of input features (784 for 28x28 MNIST).
+            hidden_dim: Width of the hidden layer (caller must supply H).
+            output_dim: Number of classes (2 for binary).
+        """
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
         self.output_dim = output_dim
 
+        # Parameter block shapes when unflattened from the single vector.
         self.shapes = {
             "W1": (hidden_dim, input_dim),
             "b1": (hidden_dim),
@@ -22,6 +34,7 @@ class BinaryNN:
         }
 
     def unflatten(self, w):
+        """Split flat parameter vector into weight and bias tensors."""
         H, D = self.hidden_dim, self.input_dim
         out = self.output_dim
 
@@ -34,9 +47,22 @@ class BinaryNN:
         return W1, b1, W2, b2
 
     def flatten(self, W1, b1, W2, b2):
+        """Concatenate parameters back into a single vector matching unflatten order."""
         return np.concatenate([W1.ravel(), b1, W2.ravel(), b2])
     
     def forward(self, X, w):
+        """
+        Compute network outputs for a batch.
+
+        Args:
+            X: Input batch shaped (N, input_dim).
+            w: Flat parameter vector.
+        Returns:
+            h: Hidden activations after tanh.
+            z1: Hidden pre-activations.
+            yhat: Softmax probabilities for each class.
+            z2: Output pre-activations.
+        """
         W1, b1, W2, b2 = self.unflatten(w)
 
         z1 = X @ W1.T + b1        # (N, H)
@@ -47,6 +73,7 @@ class BinaryNN:
         return h, z1, yhat, z2
     
     def loss(self, X, Y, w):
+        """Average cross-entropy loss for one-hot labels Y and predictions."""
         # Y is one-hot (N, 2)
         _, _, yhat, _ = self.forward(X, w)
         eps = 1e-12
@@ -54,6 +81,9 @@ class BinaryNN:
         return loss
     
     def grad(self, X, Y, w):
+        """
+        Analytic gradient via backprop, returned as a flat vector matching flatten().
+        """
         N = X.shape[0]
 
         W1, b1, W2, b2 = self.unflatten(w)
