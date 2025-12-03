@@ -1,5 +1,7 @@
 import numpy as np
 
+#This is the Xavier init
+
 def xavier_init(size_in, size_out):
     bound = np.sqrt(6 / (size_in + size_out))
     return np.random.uniform(-bound, bound, (size_out, size_in))
