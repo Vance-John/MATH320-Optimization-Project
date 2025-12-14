@@ -245,7 +245,7 @@ class LBFGS:
         runtime = time.time() - start_time
         return OptimizationResult(w, loss_history, grad_norm_history, k, runtime, status)
     
-    class SGD:
+class SGD:
         """
         Stochastic Gradient Descent (Full-Batch for this baseline).
         Updates parameters using: w = w - lr * grad
