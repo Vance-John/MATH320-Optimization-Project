@@ -23,7 +23,7 @@ class BinaryNN:
         self.shapes = {
             "W1": (hidden_dim, input_dim),
             "b1": (hidden_dim),
-            "W2": (hidden_dim, output_dim),
+            "W2": (output_dim, hidden_dim),
             "b2": (output_dim)
         }           
         self.num_params = {
