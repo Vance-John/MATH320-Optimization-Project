@@ -1,5 +1,5 @@
 import numpy as np
-from .utils import tanh, tanh_prime, softmax
+from utils import tanh, tanh_prime, softmax
 
 class BinaryNN:
     """
@@ -7,7 +7,7 @@ class BinaryNN:
     All parameters are stored as a single vector `w` so optimizers can work in
     vector space while we manually reshape inside the model.
     """
-
+    H = 10
     def __init__(self, input_dim=784, hidden_dim=H, output_dim=2):
         """
         Args:
