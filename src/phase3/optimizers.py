@@ -244,3 +244,53 @@ class LBFGS:
 
         runtime = time.time() - start_time
         return OptimizationResult(w, loss_history, grad_norm_history, k, runtime, status)
+    
+    class SGD:
+        """
+        Stochastic Gradient Descent (Full-Batch for this baseline).
+        Updates parameters using: w = w - lr * grad
+        """
+        def __init__(self, model, learning_rate=0.1, max_iter=100, tol_grad=1e-5):
+            self.model = model
+            self.lr = learning_rate
+            self.max_iter = max_iter
+            self.tol_grad = tol_grad
+
+        def optimize(self, X, Y, w0):
+            start_time = time.time()
+            w = w0.copy()
+        
+            # Initial Logging
+            current_loss = self.model.loss(X, Y, w)
+            current_grad = self.model.grad(X, Y, w)
+        
+            loss_history = [current_loss]
+            grad_norm_history = [np.linalg.norm(current_grad)]
+            status = "max_iter"
+        
+            print(f"[SGD lr={self.lr}] Init Loss: {current_loss:.6f}")
+
+            for k in range(self.max_iter):
+                # Check convergence
+                if grad_norm_history[-1] < self.tol_grad:
+                    status = "converged_grad"
+                    break
+            
+                # Update Step
+                # Recalculate grad (standard SGD)
+                grad = self.model.grad(X, Y, w)
+                w = w - self.lr * grad
+            
+                # Logging
+                # Note: Computing loss every step is expensive but needed for the plot
+                loss = self.model.loss(X, Y, w)
+                grad_norm = np.linalg.norm(grad)
+            
+                loss_history.append(loss)
+                grad_norm_history.append(grad_norm)
+            
+                if k % 10 == 0:
+                    print(f"[SGD] Iter {k}: Loss={loss:.6f}")
+                
+            runtime = time.time() - start_time
+            return OptimizationResult(w, loss_history, grad_norm_history, k, runtime, status)
