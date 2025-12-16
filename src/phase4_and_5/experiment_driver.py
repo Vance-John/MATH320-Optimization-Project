@@ -4,7 +4,7 @@ import time
 import json
 import numpy as np
 
-# --- PATH SETUP (Same robust fix as sanity_check) ---
+# --- PATH SETUP 
 current_script_dir = os.path.dirname(os.path.abspath(__file__))
 phase1_dir = os.path.abspath(os.path.join(current_script_dir, '..', 'phase1'))
 phase3_dir = os.path.abspath(os.path.join(current_script_dir, '..', 'phase3'))
@@ -19,8 +19,9 @@ from init import init_parameters
 from optimizers import BFGS, LBFGS, SGD
 
 # Configuration
-# Reduced H sizes and Iterations to ensure runtime feasibility on laptop
-HIDDEN_DIMS = [5, 10, 20, 50] 
+# Reduced H sizes and Iterations to ensure runtime feasibility
+SMALL_DIMS = [2, 3, 4, 5, 10, 20] 
+LARGE_DIMS = [30, 50, 100]
 MAX_ITER = 50 
 RESULTS_FILE = os.path.join(current_script_dir, "experiment_results.json")
 
@@ -60,24 +61,27 @@ def run_experiments():
     
     results = {}
 
-    for H in HIDDEN_DIMS:
+    ALL_DIMS = sorted(LARGE_DIMS + SMALL_DIMS)
+
+    for H in ALL_DIMS:
         print(f"\n{'='*40}")
         print(f"STARTING EXPERIMENTS FOR HIDDEN DIMENSION H={H}")
         print(f"{'='*40}")
-        
-        # 1. Initialize Model & Weights
-        # We use the SAME w0 for all optimizers to ensure fair starting point
+            # 1. Initialize Model & Weights
+            # We use the SAME w0 for all optimizers to ensure fair starting point
         model = BinaryNN(hidden_dim=H)
         w0 = init_parameters(model)
         
         results[H] = {}
         
-        # 2. Define Optimizers to Test
+            # 2. Define Optimizers to Test
         optimizers = {
             "SGD": SGD(model, learning_rate=0.1, max_iter=MAX_ITER),
-            "BFGS": BFGS(model, max_iter=MAX_ITER),
-            "L-BFGS": LBFGS(model, m=10, max_iter=MAX_ITER)
+                
+            "L-BFGS": LBFGS(model, m=5, max_iter=MAX_ITER)
         }
+        if H in SMALL_DIMS: 
+            optimizers["BFGS"] = BFGS(model, max_iter=MAX_ITER)
         
         for name, opt in optimizers.items():
             print(f"\n>> Running {name} (H={H})...")
