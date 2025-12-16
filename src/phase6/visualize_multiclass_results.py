@@ -72,7 +72,7 @@ def plot_results():
     plt.title('Test Accuracy vs. Hidden Dimension', fontsize=14)
     plt.xlabel('Hidden Dimension (H)', fontsize=12)
     plt.ylabel('Accuracy', fontsize=12)
-    plt.ylim(0.99, 1.0005) # Zoom in on the top 1% since results are so good
+    plt.ylim(0.7, 1.0005) # Zoom in on the top 1% since results are so good
     plt.grid(True, alpha=0.5)
     plt.legend(fontsize=12)
     plt.tight_layout()
